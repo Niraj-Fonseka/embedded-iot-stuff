@@ -19,7 +19,6 @@ void setup() {
 }
 
 void loop() {
-  //for testing purposes GIT
   int duration , distance;
   digitalWrite(greenLed,HIGH);
   for (pos = 0; pos <= 180; pos += 1) { 
