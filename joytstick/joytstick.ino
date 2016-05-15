@@ -10,10 +10,10 @@ void setup(){
   
 void loop(){
   Serial.print("X Axis ");
+  Serial.print(analogRead(y_axis));
+  Serial.print(" --- Y Axis ");
   Serial.print(analogRead(x_axis));
   Serial.print("\n");
-  Serial.print("Y Axis ");
-  Serial.print(analogRead(y_axis));
-  Serial.print("\n");
+
   delay(500);
 }
