@@ -14,7 +14,7 @@ topic_sub = b'lan_desk_assistant_sub'
 
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-wlan.connect("WIFINAME","PASS")
+wlan.connect("WIFI-NAME","WIFI-PWD")
 
 print(uos.uname())
 print("Freq: "  + str(machine.freq()) + " Hz")
@@ -34,7 +34,6 @@ owner_dnd = False
 owner_call = False
 
 
-reciever_auto = False
 reciever_ok = False
 reciever_dnd = False
 reciever_call = False
@@ -48,7 +47,6 @@ def print_state():
 
 
 def sub_cb(topic, msg):
-    global reciever_auto 
     global reciever_ok 
     global reciever_dnd 
     global reciever_call
@@ -60,13 +58,9 @@ def sub_cb(topic, msg):
     print("New message on topic {}".format(topic.decode('utf-8')))
     msg = msg.decode('utf-8')
     print(msg)
-    oled.fill_rect(0, 56, 128, 30, 0);
-    oled.text("m:{}".format(msg), 10, 56)
-    if msg == "auto_on":
-        reciever_auto = True
-    elif msg == "auto_off":
-        reciever_auto = False
-    elif msg == "ok_on":
+
+
+    if msg == "ok_on":
         reciever_ok = True
     elif msg == "ok_off":
         reciever_ok = False
@@ -106,7 +100,7 @@ def mqtt_setup():
             print('client connected !')
             oled.text("MQTT Connected !", 0, 35)
             oled.show()
-            time.sleep(3)
+            time.sleep(1)
             client.publish(topic_pub, topic_msg)
             return client
         except OSError as e:
@@ -128,83 +122,73 @@ def setup():
 
     mqtt_client.publish(topic_pub, topic_msg)
 
-    oled.text("Auto", 0, 5)
+    oled.text("AP", 10, 5)
     oled.text("Dnd", 40, 5)
     oled.text("Call", 72, 5)
     oled.text("Ok", 111, 5)
 
-    oled.vline(35,0,53,1)
-    oled.vline(68,0,53,1)
-    oled.vline(106,0,53,1)
+    oled.vline(35,0,64,1)
+    oled.vline(68,0,64,1)
+    oled.vline(106,0,64,1)
 
-    oled.hline(0, 30, 128, 1)               # draw horizontal line x=0, y=8, width=4, colour=1
-    oled.hline(0, 52, 128, 1)               # draw horizontal line x=0, y=8, width=4, colour=1
+    oled.hline(35, 34, 128, 1)               # draw horizontal line x=0, y=8, width=4, colour=1
+    oled.hline(35, 45, 128, 1)               # draw horizontal line x=0, y=8, width=4, colour=1
+    oled.fill_rect(36, 35, 118, 10, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
+    oled.text("Niraj", 42, 36)
 
 
     return mqtt_client
 
 
 
-#owner_ok = False
-#owner_dnd = False
-#owner_call = False
-
-#reciever_ok = False
-#reciever_dnd = False
-#reciever_call = False
-
 def user_panel():
-   global reciever_auto 
-   global reciever_ok 
-   global reciever_dnd 
-   global reciever_call
-   
+
    global owner_auto 
    global owner_ok 
    global owner_dnd 
    global owner_call
    
    if owner_auto:
-       oled.fill_rect(11, 18, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1  
+       oled.text("ON", 10, 25)
    else:
-       oled.fill_rect(11, 18, 8, 7, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
+       oled.text("OFF", 8, 25)
 
    if owner_ok:
-       oled.fill_rect(47, 18, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
+       oled.fill_rect(47, 19, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
    else:
-       oled.fill_rect(47, 18, 8, 7, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
-       
+       oled.fill_rect(47, 19, 8, 7, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
+
    if owner_dnd:
-       oled.fill_rect(82, 18, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
+       oled.fill_rect(82, 19, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
    else:
-       oled.fill_rect(82, 18, 8, 7, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
+       oled.fill_rect(82, 19, 8, 7, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
        
    if owner_call:
-       oled.fill_rect(11, 18, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1  
+       oled.fill_rect(11, 19, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1  
    else:
-       oled.fill_rect(114, 18, 8, 7, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
+       oled.fill_rect(114, 19, 8, 7, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
        
 
 def reciever_panel():
-   if reciever_auto:
-       oled.fill_rect(11, 40, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
-   else:
-       oled.fill_rect(11, 40, 8, 7, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
-
+    
+   global reciever_ok 
+   global reciever_dnd 
+   global reciever_call
+   
    if reciever_ok:
-       oled.fill_rect(47, 40, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
+       oled.fill_rect(47, 54, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
    else:
-       oled.fill_rect(47, 40, 8, 7, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
+       oled.fill_rect(47, 54, 8, 7, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
        
    if reciever_dnd:
-       oled.fill_rect(82, 40, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
+       oled.fill_rect(82, 54, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
    else:
-       oled.fill_rect(82, 40, 8, 7, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
+       oled.fill_rect(82, 54, 8, 7, 0)        # draw a rectangle outline 10,10 to 117,53, colour=1
        
    if reciever_call:
-       oled.fill_rect(114, 40, 8, 7, 1)        # draw a rectangle outline 10,10 to 1
+       oled.fill_rect(114, 54, 8, 7, 1)        # draw a rectangle outline 10,10 to 1
    else:
-       oled.fill_rect(114, 40, 8, 7, 0)        # draw a rectangle outline 10,10 to 1
+       oled.fill_rect(114, 54, 8, 7, 0)        # draw a rectangle outline 10,10 to 1
        
 
 
@@ -221,17 +205,4 @@ def main():
         reciever_panel()
         oled.show()
         
-#    while True:
-#       oled.fill_rect(11, 18, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
-#       oled.fill_rect(47, 18, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
-#       oled.fill_rect(82, 18, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
-#       oled.fill_rect(114, 18, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
-
-#       oled.fill_rect(11, 40, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
-#       oled.fill_rect(47, 40, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
-#       oled.fill_rect(82, 40, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
-#       oled.fill_rect(114, 40, 8, 7, 1)        # draw a rectangle outline 10,10 to 117,53, colour=1
-#       oled.show()
-
-
 main()
