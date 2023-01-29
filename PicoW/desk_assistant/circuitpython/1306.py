@@ -6,51 +6,58 @@
 import board, busio, displayio, os, terminalio
 import adafruit_displayio_ssd1306
 from adafruit_display_text import label
+import time 
+from adafruit_display_shapes.rect import Rect
+from adafruit_display_shapes.roundrect import RoundRect
+from adafruit_display_shapes.line import Line
+
 
 displayio.release_displays()
 
-board_type = os.uname().machine
-print(f"Board: {board_type}")
 
-if 'Pico' in board_type:
-    sda, scl = board.GP0, board.GP1
-    print("Supported.")
-    print("sda",sda)
-    print("scl",scl)
-    
-elif 'ESP32-S2' in board_type:
-    scl, sda = board.IO41, board.IO40 # With the ESP32-S2 you can use any IO pins as I2C pins
-    print("Supported.")
-    
-else:
-    print("This board is not directly supported. Change the pin definitions above.")
-    
+sda, scl = board.GP0, board.GP1
+
 i2c = busio.I2C(scl, sda)
 display_bus = displayio.I2CDisplay(i2c, device_address=0x3C)
-display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=64)
-
+display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=64, auto_refresh=True)
+display.refresh()
 # Make the display context
 splash = displayio.Group()
 display.show(splash)
 
+# Make a background color fill
 color_bitmap = displayio.Bitmap(128, 64, 1)
 color_palette = displayio.Palette(1)
-color_palette[0] = 0xFFFFFF  # White
-
-bg_sprite = displayio.TileGrid(color_bitmap, pixel_shader=color_palette, x=0, y=0)
+color_palette[0] = 0xFFFFFF
+bg_sprite = displayio.TileGrid(color_bitmap, x=0, y=0, pixel_shader=color_palette)
 splash.append(bg_sprite)
+##############################
 
-# Draw a smaller inner rectangle
-inner_bitmap = displayio.Bitmap(118, 54, 1)
-inner_palette = displayio.Palette(1)
-inner_palette[0] = 0x000000  # Black
-inner_sprite = displayio.TileGrid(inner_bitmap, pixel_shader=inner_palette, x=5, y=5)
-splash.append(inner_sprite)
+rect2 = Rect(0, 0, 128, 64, fill=0x000000, outline=0x0, stroke=3)
+splash.append(rect2)
 
-# Draw a label
-text = "Hello World!"
-text_area = label.Label(terminalio.FONT, text=text, color=0xFFFF00, x=28, y=28)
-splash.append(text_area)
+dnd_owner = label.Label(terminalio.FONT, text="DND", color=0xFFFFFF, x=10, y=10)
+splash.append(dnd_owner)
+call_owner = label.Label(terminalio.FONT, text="Call", color=0xFFFFFF, x=60, y=10)
+splash.append(call_owner)
+ok_owner = label.Label(terminalio.FONT, text="Ok", color=0xFFFFFF, x=115, y=10)
+splash.append(ok_owner)
+splash.append(Line(0, 19, 128, 19, 0xFFFFFF))
+splash.append(Line(0, 50, 128, 50, 0xFFFFFF))
 
+
+dnd_user = label.Label(terminalio.FONT, text="DND", color=0xFFFFFF, x=10, y=34)
+splash.append(dnd_user)
+
+connected_username = "sub: niraj"
+connected_user = label.Label(terminalio.FONT, text=connected_username, color=0xFFFFFF, x=30, y=59)
+splash.append(connected_user)
+
+count = 0
 while True:
-    pass
+#    text = "Value : {}".format(count)
+#    text_area = label.Label(terminalio.FONT, text=text, color=0xFFFFFF, x=28, y=28)
+#    splash.append(text_area)
+    time.sleep(1)
+#    splash.remove(text_area)
+    count = count + 1
